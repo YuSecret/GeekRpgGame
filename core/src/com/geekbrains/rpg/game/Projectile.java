@@ -18,6 +18,10 @@ public class Projectile {
         this.active = false;
     }
 
+    public Vector2 getPosition() {
+        return position;
+    }
+
     public void setup(float x, float y, float targetX, float targetY) {
         if (!active) {
             position.set(x, y);
@@ -37,7 +41,11 @@ public class Projectile {
     }
 
     public void update(float dt) {
+        if (position.x == 500) {
+            deactivate();
+        }
         if (active) {
+
             position.mulAdd(velocity, dt);
             if (position.x < 0 || position.x > 1280 || position.y < 0 || position.y > 720) {
                 deactivate();

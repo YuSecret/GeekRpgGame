@@ -9,11 +9,16 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 public class Hero {
-    private Projectile projectile;
+    private ArrayList<Projectile> projectile_List;
     private TextureRegion texture;
     private TextureRegion texturePointer;
     private TextureRegion textureHp;
+    private TextureRegion targetRegion;
+    private Target target;
     private Vector2 position;
     private Vector2 dst;
     private Vector2 tmp;
@@ -22,13 +27,17 @@ public class Hero {
     private int hp;
     private int hpMax;
     private StringBuilder strBuilder;
-
-    public Hero(TextureAtlas atlas) {
+    private TextureAtlas atlas;
+    Random random = new Random();
+    public Hero(TextureAtlas atlas, TextureAtlas targetAtlas) {
+        this.atlas = atlas;
+        this.target = new Target(targetAtlas);
         this.texture = atlas.findRegion("knight");
+        this.targetRegion = targetAtlas.findRegion("ya");
         this.texturePointer = atlas.findRegion("pointer");
         this.textureHp = atlas.findRegion("hp");
         this.position = new Vector2(100, 100);
-        this.projectile = new Projectile(atlas);
+        this.projectile_List = new ArrayList<>();
         this.dst = new Vector2(position);
         this.tmp = new Vector2(0, 0);
         this.speed = 300.0f;
@@ -41,7 +50,11 @@ public class Hero {
         batch.draw(texturePointer, dst.x - 30, dst.y - 30, 30, 30, 60, 60, 0.5f, 0.5f, lifetime * 90.0f);
         batch.draw(texture, position.x - 30, position.y - 30, 30, 30, 60, 60, 1, 1, 0);
         batch.draw(textureHp, position.x - 30, position.y + 30, 60 * ((float) hp / hpMax), 12);
-        projectile.render(batch);
+        target.render(batch);
+        for (int i = 0; i < projectile_List.size(); i++) {
+           projectile_List.get(i).render(batch);
+        }
+
     }
 
     public void renderGUI(SpriteBatch batch, BitmapFont font) {
@@ -52,13 +65,19 @@ public class Hero {
     }
 
     public void update(float dt) {
-        projectile.update(dt);
+        for (int i = 0; i < projectile_List.size(); i++) {
+            projectile_List.get(i).update(dt);
+            target.update(dt, projectile_List.get(i).getPosition());
+        }
         lifetime += dt;
+
         if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
             dst.set(Gdx.input.getX(), 720.0f - Gdx.input.getY());
         }
         if (Gdx.input.isButtonJustPressed(Input.Buttons.RIGHT)) {
+            Projectile projectile = new Projectile(atlas);
             projectile.setup(position.x, position.y, Gdx.input.getX(), 720.0f - Gdx.input.getY());
+            projectile_List.add(projectile);
         }
         tmp.set(dst).sub(position).nor().scl(speed); // вектор скорости
         if (position.dst(dst) > speed * dt) {
