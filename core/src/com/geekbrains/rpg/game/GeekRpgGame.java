@@ -14,6 +14,7 @@ public class GeekRpgGame extends ApplicationAdapter {
     private SpriteBatch batch;
     private BitmapFont font32;
     private TextureAtlas atlas;
+    private TextureAtlas targetAtlas;
     private TextureRegion textureGrass;
     private Hero hero;
 
@@ -27,7 +28,8 @@ public class GeekRpgGame extends ApplicationAdapter {
     public void create() {
         this.batch = new SpriteBatch();
         this.atlas = new TextureAtlas("game.pack");
-        this.hero = new Hero(atlas);
+        this.targetAtlas = new TextureAtlas("pack.atlas");
+        this.hero = new Hero(atlas, targetAtlas);
         this.textureGrass = atlas.findRegion("grass");
         this.font32 = new BitmapFont(Gdx.files.internal("font32.fnt"));
     }
