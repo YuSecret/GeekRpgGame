@@ -7,7 +7,7 @@ import com.geekbrains.rpg.game.screens.utils.Assets;
 
 public class Monster extends GameCharacter {
     private float attackTime;
-
+    private float randomTarget;
     public Monster(GameController gc) {
         super(gc, 20, 100.0f);
         this.texture = Assets.getInstance().getAtlas().findRegion("knight");
@@ -17,8 +17,9 @@ public class Monster extends GameCharacter {
 
     @Override
     public void onDeath() {
-        this.position.set(MathUtils.random(0, 1280), MathUtils.random(0, 720));
-        this.hp = this.hpMax;
+        gc.removeMonster(this);
+        //this.position.set(MathUtils.random(0, 1280), MathUtils.random(0, 720));
+        //this.hp = this.hpMax;
     }
 
     @Override
@@ -31,9 +32,15 @@ public class Monster extends GameCharacter {
 
     public void update(float dt) {
         super.update(dt);
-
+        randomTarget+=dt;
         if (this.position.dst(gc.getHero().getPosition()) <= 300) {
             dst.set(gc.getHero().getPosition());
+        }
+        else {
+            if (randomTarget>1f) {
+                randomTarget = 0f;
+                dst.set(MathUtils.random(position.x, 1280), MathUtils.random(position.y, 720));
+            }
         }
 
         if (this.position.dst(gc.getHero().getPosition()) < 40) {

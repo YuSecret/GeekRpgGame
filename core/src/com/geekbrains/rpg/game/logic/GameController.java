@@ -11,7 +11,7 @@ public class GameController {
     private Hero hero;
     private ArrayList <Monster> monsters;
     private Vector2 tmp, tmp2;
-
+    private float periodNewMonster;
     public Hero getHero() {
         return hero;
     }
@@ -44,7 +44,9 @@ public class GameController {
         this.tmp = new Vector2(0, 0);
         this.tmp2 = new Vector2(0, 0);
     }
-
+    public void removeMonster(Monster monster) {
+        this.monsters.remove(monster);
+    }
     public void update(float dt) {
         hero.update(dt);
         for (Monster m: this.monsters) {
@@ -52,7 +54,12 @@ public class GameController {
             checkCollisions(m);
             collideUnits(hero, m);
         }
-
+        periodNewMonster +=dt;
+        if (periodNewMonster>=30f) {
+            Monster m = new Monster(this);
+            this.monsters.add(m);
+            periodNewMonster=0;
+        }
         projectilesController.update(dt);
     }
 
