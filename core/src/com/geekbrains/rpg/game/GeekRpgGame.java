@@ -1,58 +1,36 @@
 package com.geekbrains.rpg.game;
 
-import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
+import com.geekbrains.rpg.game.screens.ScreenManager;
 
-public class GeekRpgGame extends ApplicationAdapter {
+public class GeekRpgGame extends Game {
     private SpriteBatch batch;
-    private BitmapFont font32;
-    private TextureAtlas atlas;
-    private TextureAtlas targetAtlas;
-    private TextureRegion textureGrass;
-    private Hero hero;
 
     // Домашнее задание:
-    // 0. Разобраться с кодом
-    // 1. Добавить на экран яблоко, и попробовать отследить попадание
-    // стрелы в яблоко, при попадании яблоко должно появиться в новом месте
-    // 2. ** Попробуйте заставить героя выпускать по несколько стрел
+    // - Разбор кода и пишите какие вопросы возникли
+    // - Бот должен бегать и атаковать игрока только если герой зашел
+    // в зону видимости бота (300 пикселей)
+    // - Сделать пачку ботов
+    // - При уничтожении бот должен исчезать
+    // - * Раз в 30 секунд должен появляться новый бот
+    // - * Если герой не в зоне видимости бота, то бот просто бродит по карте
 
     @Override
     public void create() {
-        this.batch = new SpriteBatch();
-        this.atlas = new TextureAtlas("game.pack");
-        this.targetAtlas = new TextureAtlas("pack.atlas");
-        this.hero = new Hero(atlas, targetAtlas);
-        this.textureGrass = atlas.findRegion("grass");
-        this.font32 = new BitmapFont(Gdx.files.internal("font32.fnt"));
+        batch = new SpriteBatch();
+        ScreenManager.getInstance().init(this, batch);
+        ScreenManager.getInstance().changeScreen(ScreenManager.ScreenType.GAME);
     }
 
     @Override
     public void render() {
-        float dt = Gdx.graphics.getDeltaTime();
-        update(dt);
-        Gdx.gl.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        batch.begin();
-        for (int i = 0; i < 16; i++) {
-            for (int j = 0; j < 9; j++) {
-                batch.draw(textureGrass, i * 80, j * 80);
-            }
-        }
-        hero.render(batch);
-        hero.renderGUI(batch, font32);
-        batch.end();
-    }
-
-    public void update(float dt) {
-        hero.update(dt);
+        float dt = Gdx.graphics.getDeltaTime();
+        getScreen().render(dt);
     }
 
     @Override
