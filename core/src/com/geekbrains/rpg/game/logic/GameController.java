@@ -3,19 +3,21 @@ package com.geekbrains.rpg.game.logic;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
+import java.util.ArrayList;
+
 public class GameController {
     private ProjectilesController projectilesController;
     private Map map;
     private Hero hero;
-    private Monster monster;
+    private ArrayList <Monster> monsters;
     private Vector2 tmp, tmp2;
 
     public Hero getHero() {
         return hero;
     }
 
-    public Monster getMonster() {
-        return monster;
+    public ArrayList<Monster> getMonsters() {
+        return this.monsters;
     }
 
     public Map getMap() {
@@ -29,7 +31,15 @@ public class GameController {
     public GameController() {
         this.projectilesController = new ProjectilesController();
         this.hero = new Hero(this);
-        this.monster = new Monster(this);
+
+        this.monsters = new ArrayList<Monster>();
+        Monster m1 = new Monster(this);
+        Monster m2 = new Monster(this);
+        Monster m3 = new Monster(this);
+        this.monsters.add(m1);
+        this.monsters.add(m2);
+        this.monsters.add(m3);
+
         this.map = new Map();
         this.tmp = new Vector2(0, 0);
         this.tmp2 = new Vector2(0, 0);
@@ -37,10 +47,12 @@ public class GameController {
 
     public void update(float dt) {
         hero.update(dt);
-        monster.update(dt);
+        for (Monster m: this.monsters) {
+            m.update(dt);
+            checkCollisions(m);
+            collideUnits(hero, m);
+        }
 
-        checkCollisions();
-        collideUnits(hero, monster);
         projectilesController.update(dt);
     }
 
@@ -63,7 +75,7 @@ public class GameController {
         }
     }
 
-    public void checkCollisions() {
+    public void checkCollisions(Monster monster) {
         for (int i = 0; i < projectilesController.getActiveList().size(); i++) {
             Projectile p = projectilesController.getActiveList().get(i);
             if (!map.isAirPassable(p.getCellX(), p.getCellY())) {

@@ -11,7 +11,8 @@ public class Monster extends GameCharacter {
     public Monster(GameController gc) {
         super(gc, 20, 100.0f);
         this.texture = Assets.getInstance().getAtlas().findRegion("knight");
-        this.changePosition(800.0f, 300.0f);
+        this.position.set(MathUtils.random(0, 1280), MathUtils.random(0, 720));
+        //this.changePosition(800.0f, 300.0f);
     }
 
     @Override
@@ -30,7 +31,11 @@ public class Monster extends GameCharacter {
 
     public void update(float dt) {
         super.update(dt);
-        dst.set(gc.getHero().getPosition());
+
+        if (this.position.dst(gc.getHero().getPosition()) <= 300) {
+            dst.set(gc.getHero().getPosition());
+        }
+
         if (this.position.dst(gc.getHero().getPosition()) < 40) {
             attackTime += dt;
             if(attackTime > 0.3f) {
