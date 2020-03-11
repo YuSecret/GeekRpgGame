@@ -61,4 +61,5 @@ public class Projectile implements Poolable, MapElement {
             deactivate();
         }
     }
+
 }
