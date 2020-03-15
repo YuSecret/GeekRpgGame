@@ -23,12 +23,12 @@ public class Map {
     }
 
     public boolean isGroundPassable(Vector2 position) {
-        return data[(int)(position.x / 80)][(int)(position.y / 80)] == 0;
+        return isGroundPassable((int) (position.x / 80), (int) (position.y / 80));
     }
 
     public Map() {
         this.data = new byte[MAP_CELLS_WIDTH][MAP_CELLS_HEIGHT];
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 5; i++) {
             data[MathUtils.random(15)][MathUtils.random(8)] = 1;
         }
         this.grassTexture = Assets.getInstance().getAtlas().findRegion("grass");
