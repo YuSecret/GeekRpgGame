@@ -14,9 +14,14 @@ public class GameController {
     private Map map;
     private Hero hero;
     private Vector2 tmp, tmp2;
-
+    private boolean isPause;
     public List<GameCharacter> getAllCharacters() {
         return allCharacters;
+    }
+
+    public void setPause() {
+        if (isPause) {isPause = false;}
+        else {isPause=true;}
     }
 
     public Hero getHero() {
@@ -51,6 +56,7 @@ public class GameController {
     }
 
     public void update(float dt) {
+        if (isPause) {return;}
         allCharacters.clear();
         allCharacters.add(hero);
         allCharacters.addAll(monstersController.getActiveList());

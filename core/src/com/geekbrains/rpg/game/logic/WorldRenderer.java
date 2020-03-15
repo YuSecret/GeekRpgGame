@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.geekbrains.rpg.game.logic.utils.MapElement;
 import com.geekbrains.rpg.game.screens.utils.Assets;
+import org.graalvm.compiler.phases.common.NodeCounterPhase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +17,6 @@ public class WorldRenderer {
     private SpriteBatch batch;
     private BitmapFont font32;
     private List<MapElement>[] drawables;
-
     public WorldRenderer(GameController gameController, SpriteBatch batch) {
         this.gc = gameController;
         this.font32 = Assets.getInstance().getAssetManager().get("fonts/font32.ttf");
