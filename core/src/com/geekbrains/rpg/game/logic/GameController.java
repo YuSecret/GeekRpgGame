@@ -1,27 +1,48 @@
 package com.geekbrains.rpg.game.logic;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.geekbrains.rpg.game.screens.ScreenManager;
+import com.geekbrains.rpg.game.screens.utils.Assets;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GameController {
     private ProjectilesController projectilesController;
+    private PowerUpsController powerUpsController;
     private MonstersController monstersController;
     private WeaponsController weaponsController;
+    private SpecialEffectsController specialEffectsController;
+    private InfoController infoController;
     private List<GameCharacter> allCharacters;
+    private Music music;
     private Map map;
     private Hero hero;
     private Vector2 tmp, tmp2;
-    private boolean isPause;
-    public List<GameCharacter> getAllCharacters() {
-        return allCharacters;
+    private Vector2 mouse;
+    private float worldTimer;
+
+    public Vector2 getMouse() {
+        return mouse;
     }
 
-    public void setPause() {
-        if (isPause) {isPause = false;}
-        else {isPause=true;}
+    public float getWorldTimer() {
+        return worldTimer;
+    }
+
+    public SpecialEffectsController getSpecialEffectsController() {
+        return specialEffectsController;
+    }
+
+    public PowerUpsController getPowerUpsController() {
+        return powerUpsController;
+    }
+
+    public List<GameCharacter> getAllCharacters() {
+        return allCharacters;
     }
 
     public Hero getHero() {
@@ -40,23 +61,37 @@ public class GameController {
         return projectilesController;
     }
 
+    public InfoController getInfoController() {
+        return infoController;
+    }
+
     public WeaponsController getWeaponsController() {
         return weaponsController;
     }
 
     public GameController() {
         this.allCharacters = new ArrayList<>();
-        this.projectilesController = new ProjectilesController();
+        this.projectilesController = new ProjectilesController(this);
         this.weaponsController = new WeaponsController(this);
+        this.powerUpsController = new PowerUpsController(this);
+        this.infoController = new InfoController();
         this.hero = new Hero(this);
         this.map = new Map();
-        this.monstersController = new MonstersController(this, 5);
+        this.monstersController = new MonstersController(this, 25);
+        this.specialEffectsController = new SpecialEffectsController();
         this.tmp = new Vector2(0, 0);
         this.tmp2 = new Vector2(0, 0);
+        this.mouse = new Vector2(0, 0);
+        this.music = Gdx.audio.newMusic(Gdx.files.internal("audio/music.wav"));
+        this.music.setLooping(true);
+        // this.music.play();
     }
 
     public void update(float dt) {
-        if (isPause) {return;}
+        mouse.set(Gdx.input.getX(), Gdx.input.getY());
+        ScreenManager.getInstance().getViewport().unproject(mouse);
+
+        worldTimer += dt;
         allCharacters.clear();
         allCharacters.add(hero);
         allCharacters.addAll(monstersController.getActiveList());
@@ -66,6 +101,9 @@ public class GameController {
         checkCollisions();
         projectilesController.update(dt);
         weaponsController.update(dt);
+        powerUpsController.update(dt);
+        specialEffectsController.update(dt);
+        infoController.update(dt);
     }
 
     public void collideUnits(GameCharacter u1, GameCharacter u2) {
@@ -112,7 +150,7 @@ public class GameController {
                 p.deactivate();
                 continue;
             }
-            if (p.getPosition().dst(hero.getPosition()) < 24 && p.getOwner() != hero) {
+            if (p.getPosition().dst(hero.getPosition()) < 18 && p.getOwner() != hero) {
                 p.deactivate();
                 hero.takeDamage(p.getOwner(), p.getDamage());
             }
@@ -121,11 +159,23 @@ public class GameController {
                 if (p.getOwner() == m) {
                     continue;
                 }
-                if (p.getPosition().dst(m.getPosition()) < 24) {
+                if (p.getPosition().dst(m.getPosition()) < 18) {
                     p.deactivate();
                     m.takeDamage(p.getOwner(), p.getDamage());
                 }
             }
         }
+
+        for (int i = 0; i < powerUpsController.getActiveList().size(); i++) {
+            PowerUp p = powerUpsController.getActiveList().get(i);
+            if (p.getPosition().dst(hero.getPosition()) < 24) {
+                p.consume(hero);
+            }
+        }
+    }
+
+    public void dispose() {
+        hero.dispose();
+        music.dispose();
     }
 }
